@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KannuHost - Diwali Rocket Blaster Game</title>
+  <title>Horizon Ultra 3D - Open World Driving</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,26 +13,18 @@
     }
 
     body {
-      background: #080711;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #050508;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: #fff;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
+      height: 100vh;
+      width: 100vw;
     }
 
     #game-container {
       position: relative;
-      width: 800px;
-      height: 600px;
-      background: linear-gradient(to bottom, #05050f 0%, #111029 70%, #1a0b2e 100%);
-      border: 3px solid #ffaa00;
-      border-radius: 12px;
-      box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
-      overflow: hidden;
+      width: 100%;
+      height: 100%;
     }
 
     canvas {
@@ -41,368 +33,438 @@
       height: 100%;
     }
 
-    /* UI Header Overlay */
-    .ui-layer {
+    /* Modern Speedometer & HUD UI */
+    .hud {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-      z-index: 5;
-    }
-
-    .score-board {
-      font-size: 22px;
-      font-weight: 700;
-      color: #ffea00;
-      text-shadow: 0 0 10px rgba(255, 234, 0, 0.6);
-    }
-
-    .timer-board {
-      font-size: 22px;
-      font-weight: 700;
-      color: #ff4081;
-      text-shadow: 0 0 10px rgba(255, 64, 129, 0.6);
-    }
-
-    /* Game Screens Overlay */
-    .screen-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(8, 7, 17, 0.85);
-      backdrop-filter: blur(4px);
+      bottom: 25px;
+      right: 35px;
+      background: rgba(12, 16, 26, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 20px;
+      padding: 20px 30px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      z-index: 10;
-      text-align: center;
-      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      pointer-events: none;
     }
 
-    .title {
-      font-size: 42px;
+    .speed-val {
+      font-size: 52px;
       font-weight: 900;
-      background: linear-gradient(45deg, #ff0055, #ffcc00, #00ffcc);
+      background: linear-gradient(180deg, #ffffff, #00f2fe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .speed-unit {
+      font-size: 14px;
+      color: #8a94a6;
       letter-spacing: 2px;
-    }
-
-    .subtitle {
-      font-size: 16px;
-      color: #cfd8dc;
-      margin-bottom: 30px;
-      max-width: 500px;
-      line-height: 1.5;
-    }
-
-    .btn {
-      background: linear-gradient(135deg, #ff9900, #ff5500);
-      color: #fff;
-      border: none;
-      padding: 14px 36px;
-      font-size: 20px;
       font-weight: 700;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(255, 102, 0, 0.6);
-      transition: all 0.2s ease;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      margin-top: 4px;
     }
 
-    .btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 30px rgba(255, 102, 0, 0.9);
+    .gear-box {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
-    .hidden {
-      display: none !important;
+    .gear-badge {
+      background: linear-gradient(135deg, #ff007f, #7928ca);
+      padding: 6px 18px;
+      border-radius: 10px;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
     }
 
-    .brand-footer {
+    .nos-indicator {
+      font-size: 12px;
+      font-weight: 700;
+      color: #00ffcc;
+      text-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
+    }
+
+    /* Car Selector Overlay */
+    .selector-bar {
       position: absolute;
-      bottom: 12px;
-      font-size: 13px;
-      color: #78909c;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      background: rgba(15, 17, 23, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.1);
+      z-index: 10;
+    }
+
+    .car-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .car-btn:hover, .car-btn.active {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      border-color: #00f2fe;
+      box-shadow: 0 0 15px rgba(0, 198, 255, 0.5);
+    }
+
+    /* Controls Guide Overlay */
+    .controls-guide {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(12, 16, 26, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 12px;
+      color: #ccc;
+      line-height: 1.8;
+      pointer-events: none;
+    }
+
+    .key {
+      background: #252836;
+      color: #00f2fe;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+      border: 1px solid rgba(0,242,254,0.3);
+    }
+
+    /* Nitro Flame Effect Overlay Flash */
+    .nitro-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      box-shadow: inset 0 0 100px rgba(255, 0, 100, 0);
+      transition: box-shadow 0.1s ease;
+    }
+
+    .nitro-active {
+      box-shadow: inset 0 0 100px rgba(255, 0, 100, 0.4);
     }
   </style>
+
+  <!-- Three.js Engine & Orbit Controls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
   <div id="game-container">
-    <!-- UI Overlay -->
-    <div class="ui-layer">
-      <div class="score-board">🪔 Score: <span id="scoreText">0</span></div>
-      <div class="timer-board">⏱️ Time: <span id="timerText">60</span>s</div>
+    <div class="nitro-overlay" id="nitroFx"></div>
+
+    <!-- Car Switcher -->
+    <div class="selector-bar">
+      <button class="car-btn active" id="btnEcco" onclick="switchCar('ecco')">🚐 EECO VAN (5 Lakh KM/H)</button>
+      <button class="car-btn" id="btnBmw" onclick="switchCar('bmw')">🏎️ BMW M4 SPORT</button>
     </div>
 
-    <!-- Canvas -->
-    <canvas id="gameCanvas"></canvas>
-
-    <!-- Start Screen -->
-    <div id="startScreen" class="screen-overlay">
-      <h1 class="title">🪔 Diwali Rocket Blaster</h1>
-      <p class="subtitle">Aasmaan me aane wale Rocket Crackers par click karke unhe burst karo aur shandar Diwali Aatishbaji banao! Ghanti wallah bomb touch mat karna!</p>
-      <button class="btn" onclick="startGame()">PLAY GAME</button>
-      <div class="brand-footer">Powered by ⚡ KannuHost Engine</div>
+    <!-- Keybind Guide -->
+    <div class="controls-guide">
+      <div><span class="key">W</span> / <span class="key">S</span> : Accelerate / Reverse</div>
+      <div><span class="key">A</span> / <span class="key">D</span> : Steer Left / Right</div>
+      <div><span class="key">SPACE</span> : Handbrake</div>
+      <div><span class="key">E</span> / <span class="key">Q</span> : Shift Gear Up / Down (1-10)</div>
+      <div><span class="key">SHIFT</span> : Exhaust Flame & Beast Boost ⚡</div>
     </div>
 
-    <!-- Game Over Screen -->
-    <div id="gameOverScreen" class="screen-overlay hidden">
-      <h1 class="title">💥 HAPPY DIWALI! 🪔</h1>
-      <p class="subtitle" style="font-size: 22px; color: #ffea00;" id="finalScoreText">Your Score: 0</p>
-      <p class="subtitle">Aapne pure aasmaan ko colorful patako se roshan kar diya!</p>
-      <button class="btn" onclick="startGame()">PLAY AGAIN</button>
+    <!-- Speed & Gear HUD -->
+    <div class="hud">
+      <div class="speed-val" id="speedometer">0</div>
+      <div class="speed-unit">KM / H</div>
+      <div class="gear-box">
+        <div class="gear-badge" id="gearDisplay">G 1</div>
+        <div class="nos-indicator" id="nosText">EXHAUST READY</div>
+      </div>
     </div>
   </div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    // --- THREE.JS ENGINE SETUP ---
+    const container = document.getElementById('game-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0d14);
+    scene.fog = new THREE.FogExp2(0x0a0d14, 0.00015);
 
-    canvas.width = 800;
-    canvas.height = 600;
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 20000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    container.appendChild(renderer.domElement);
 
-    let score = 0;
-    let timeLeft = 60;
-    let gameInterval = null;
-    let timerInterval = null;
-    let isPlaying = false;
+    // --- LIGHTING (Horizon Style Soft Sunlight) ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
 
-    let rockets = [];
-    let particles = [];
-    let diyaList = [];
+    const sunLight = new THREE.DirectionalLight(0xfffaed, 1.8);
+    sunLight.position.set(1000, 2000, 1000);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 5000;
+    const d = 1000;
+    sunLight.shadow.camera.left = -d;
+    sunLight.shadow.camera.right = d;
+    sunLight.shadow.camera.top = d;
+    sunLight.shadow.camera.bottom = -d;
+    scene.add(sunLight);
 
-    // Initialize Bottom Decorative Diyas
-    for (let i = 0; i < 9; i++) {
-      diyaList.push({
-        x: 60 + i * 85,
-        y: 575
-      });
-    }
+    // --- ULTRA HUGE OPEN WORLD MAP (BGMI Highway Level) ---
+    const mapGroup = new THREE.Group();
+    scene.add(mapGroup);
 
-    class Rocket {
-      constructor() {
-        this.x = Math.random() * (canvas.width - 100) + 50;
-        this.y = canvas.height + 20;
-        this.speed = Math.random() * 2.5 + 2.5;
-        this.radius = 16;
-        this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-        this.isBomb = Math.random() < 0.15; // 15% chance to spawn black bomb
-        if (this.isBomb) {
-          this.color = '#333';
-        }
-      }
-
-      update() {
-        this.y -= this.speed;
-      }
-
-      draw() {
-        ctx.save();
-        if (this.isBomb) {
-          // Draw Danger Bomb Rocket
-          ctx.fillStyle = '#ff1744';
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = '#fff';
-          ctx.font = 'bold 14px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('💣', this.x, this.y + 5);
-        } else {
-          // Draw Rocket Body
-          ctx.fillStyle = this.color;
-          ctx.beginPath();
-          ctx.moveTo(this.x, this.y - 20);
-          ctx.lineTo(this.x - 10, this.y + 10);
-          ctx.lineTo(this.x + 10, this.y + 10);
-          ctx.closePath();
-          ctx.fill();
-
-          // Rocket Tail Flame
-          ctx.fillStyle = '#ff9900';
-          ctx.beginPath();
-          ctx.arc(this.x, this.y + 14, 5 + Math.random() * 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
-      }
-    }
-
-    class Particle {
-      constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 6 + 1;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.alpha = 1;
-        this.decay = Math.random() * 0.02 + 0.015;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vy += 0.05; // gravity effect
-        this.alpha -= this.decay;
-      }
-
-      draw() {
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-    }
-
-    function createExplosion(x, y, color) {
-      const particleCount = 40;
-      for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle(x, y, color));
-      }
-    }
-
-    function drawDiyas() {
-      diyaList.forEach(diya => {
-        // Base
-        ctx.fillStyle = '#d84315';
-        ctx.beginPath();
-        ctx.arc(diya.x, diya.y, 16, 0, Math.PI);
-        ctx.fill();
-
-        // Flame
-        ctx.fillStyle = '#ffea00';
-        ctx.beginPath();
-        ctx.arc(diya.x, diya.y - 6, 5 + Math.random() * 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#ff3d00';
-        ctx.beginPath();
-        ctx.arc(diya.x, diya.y - 4, 3, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    function gameLoop() {
-      if (!isPlaying) return;
-
-      // Clear & Draw Night Sky
-      ctx.fillStyle = 'rgba(8, 7, 17, 0.25)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw Bottom Diyas
-      drawDiyas();
-
-      // Spawn Rockets Randomly
-      if (Math.random() < 0.05) {
-        rockets.push(new Rocket());
-      }
-
-      // Update & Draw Rockets
-      for (let i = rockets.length - 1; i >= 0; i--) {
-        const r = rockets[i];
-        r.update();
-        r.draw();
-
-        // Remove offscreen rockets
-        if (r.y < -30) {
-          rockets.splice(i, 1);
-        }
-      }
-
-      // Update & Draw Explosions Particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.update();
-        p.draw();
-
-        if (p.alpha <= 0) {
-          particles.splice(i, 1);
-        }
-      }
-
-      requestAnimationFrame(gameLoop);
-    }
-
-    // Click Detection for Bursting Rockets
-    canvas.addEventListener('pointerdown', function (e) {
-      if (!isPlaying) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
-
-      for (let i = rockets.length - 1; i >= 0; i--) {
-        const r = rockets[i];
-        const dist = Math.hypot(clickX - r.x, clickY - r.y);
-
-        if (dist < r.radius + 15) {
-          if (r.isBomb) {
-            // Bomb Clicked Penalty
-            score = Math.max(0, score - 50);
-            createExplosion(r.x, r.y, '#ff0000');
-          } else {
-            // Rocket Hit Success
-            score += 100;
-            createExplosion(r.x, r.y, r.color);
-          }
-
-          document.getElementById('scoreText').innerText = score;
-          rockets.splice(i, 1);
-          break;
-        }
-      }
+    // Giant Terrain
+    const terrainGeo = new THREE.PlaneGeometry(30000, 30000, 64, 64);
+    const terrainMat = new THREE.MeshStandardMaterial({
+      color: 0x1a2417,
+      roughness: 0.9,
+      metalness: 0.1
     });
+    const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+    terrain.rotation.x = -Math.PI / 2;
+    terrain.receiveShadow = true;
+    mapGroup.add(terrain);
 
-    function startGame() {
-      score = 0;
-      timeLeft = 60;
-      rockets = [];
-      particles = [];
-      isPlaying = true;
+    // Endless Highway Loop Structure
+    const roadWidth = 40;
+    const roadLength = 25000;
+    const roadGeo = new THREE.PlaneGeometry(roadWidth, roadLength);
+    const roadMat = new THREE.MeshStandardMaterial({ color: 0x111115, roughness: 0.4 });
 
-      document.getElementById('scoreText').innerText = score;
-      document.getElementById('timerText').innerText = timeLeft;
+    // Main Highway
+    const roadMain = new THREE.Mesh(roadGeo, roadMat);
+    roadMain.rotation.x = -Math.PI / 2;
+    roadMain.position.y = 0.1;
+    roadMain.receiveShadow = true;
+    mapGroup.add(roadMain);
 
-      document.getElementById('startScreen').classList.add('hidden');
-      document.getElementById('gameOverScreen').classList.add('hidden');
+    // Cross Highway
+    const roadCross = new THREE.Mesh(new THREE.PlaneGeometry(roadLength, roadWidth), roadMat);
+    roadCross.rotation.x = -Math.PI / 2;
+    roadCross.position.y = 0.15;
+    roadCross.receiveShadow = true;
+    mapGroup.add(roadCross);
 
-      if (timerInterval) clearInterval(timerInterval);
-
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timerText').innerText = timeLeft;
-
-        if (timeLeft <= 0) {
-          endGame();
-        }
-      }, 1000);
-
-      requestAnimationFrame(gameLoop);
+    // Road Markings (Lines)
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
+    for (let z = -roadLength / 2; z < roadLength / 2; z += 60) {
+      const lineGeo = new THREE.PlaneGeometry(1.5, 30);
+      const line = new THREE.Mesh(lineGeo, lineMat);
+      line.rotation.x = -Math.PI / 2;
+      line.position.set(0, 0.2, z);
+      mapGroup.add(line);
     }
 
-    function endGame() {
-      isPlaying = false;
-      clearInterval(timerInterval);
-      document.getElementById('finalScoreText').innerText = `Final Score: ${score}`;
-      document.getElementById('gameOverScreen').classList.remove('hidden');
+    // Street Lights & Environment Props Generator
+    const poleGeo = new THREE.CylinderGeometry(0.3, 0.5, 18);
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.8 });
+    const lampGeo = new THREE.SphereGeometry(1.2, 16, 16);
+    const lampMat = new THREE.MeshBasicMaterial({ color: 0x00f2fe });
+
+    for (let z = -10000; z < 10000; z += 300) {
+      [-24, 24].forEach(x => {
+        const pole = new THREE.Mesh(poleGeo, poleMat);
+        pole.position.set(x, 9, z);
+        pole.castShadow = true;
+        mapGroup.add(pole);
+
+        const lamp = new THREE.Mesh(lampGeo, lampMat);
+        lamp.position.set(x, 18, z);
+        mapGroup.add(lamp);
+      });
     }
-  </script>
-</body>
-</html>
+
+    // High Buildings / Scenery
+    const bldgMat = new THREE.MeshStandardMaterial({ color: 0x1e2430, roughness: 0.3 });
+    for (let i = 0; i < 150; i++) {
+      const h = 50 + Math.random() * 200;
+      const bldgGeo = new THREE.BoxGeometry(40 + Math.random() * 60, h, 40 + Math.random() * 60);
+      const bldg = new THREE.Mesh(bldgGeo, bldgMat);
+      const side = Math.random() > 0.5 ? 1 : -1;
+      bldg.position.set(side * (80 + Math.random() * 800), h / 2, (Math.random() - 0.5) * 15000);
+      bldg.castShadow = true;
+      mapGroup.add(bldg);
+    }
+
+    // --- CAR VEHICLE BUILDERS ---
+    const vehicleGroup = new THREE.Group();
+    scene.add(vehicleGroup);
+
+    let eccoMesh, bmwMesh;
+    let exhaustFlames = [];
+
+    // Create Exhaust Flame Particles
+    const flameGeo = new THREE.ConeGeometry(0.4, 3, 8);
+    flameGeo.rotateX(-Math.PI / 2);
+    const flameMat = new THREE.MeshBasicMaterial({ color: 0xff3300 });
+
+    function createExhaust(x, y, z) {
+      const flame = new THREE.Mesh(flameGeo, flameMat);
+      flame.position.set(x, y, z);
+      flame.visible = false;
+      exhaustFlames.push(flame);
+      return flame;
+    }
+
+    // 1. Maruti EECO Van Procedural 3D Model
+    function buildEccoVan() {
+      const ecco = new THREE.Group();
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.1, roughness: 0.2 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9, roughness: 0.1 });
+      const bumperMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+
+      // Main Box Body
+      const bodyGeo = new THREE.BoxGeometry(4.2, 4.5, 9);
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = 3;
+      body.castShadow = true;
+      ecco.add(body);
+
+      // Cabin Front Slope
+      const frontGeo = new THREE.BoxGeometry(4.15, 2.2, 2.5);
+      const front = new THREE.Mesh(frontGeo, bodyMat);
+      front.position.set(0, 1.8, 4.5);
+      ecco.add(front);
+
+      // Windows
+      const windshieldGeo = new THREE.PlaneGeometry(3.8, 2);
+      const windshield = new THREE.Mesh(windshieldGeo, glassMat);
+      windshield.position.set(0, 3.4, 4.56);
+      windshield.rotation.x = -0.15;
+      ecco.add(windshield);
+
+      // Bumpers
+      const bumperGeo = new THREE.BoxGeometry(4.3, 1.2, 0.5);
+      const bumper = new THREE.Mesh(bumperGeo, bumperMat);
+      bumper.position.set(0, 1.2, 5.75);
+      ecco.add(bumper);
+
+      // Exhaust Pipe + Flames
+      ecco.add(createExhaust(-1.2, 0.8, -4.6));
+      ecco.add(createExhaust(1.2, 0.8, -4.6));
+
+      return ecco;
+    }
+
+    // 2. BMW M4 Sport Procedural 3D Model
+    function buildBmwCar() {
+      const bmw = new THREE.Group();
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0055ff, metalness: 0.8, roughness: 0.2 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x050505, metalness: 0.9, roughness: 0.05 });
+      const carbonMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 });
+
+      // Sleek Low Body
+      const bodyGeo = new THREE.BoxGeometry(4.4, 2.2, 9.5);
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = 1.8;
+      body.castShadow = true;
+      bmw.add(body);
+
+      // Roof Coupe Top
+      const roofGeo = new THREE.BoxGeometry(3.8, 1.6, 4.5);
+      const roof = new THREE.Mesh(roofGeo, bodyMat);
+      roof.position.set(0, 3.3, -0.5);
+      bmw.add(roof);
+
+      // Windshield
+      const windshieldGeo = new THREE.PlaneGeometry(3.6, 1.8);
+      const windshield = new THREE.Mesh(windshieldGeo, glassMat);
+      windshield.position.set(0, 3.1, 1.8);
+      windshield.rotation.x = -0.55;
+      bmw.add(windshield);
+
+      // Quad Exhaust Pipes + Flames
+      bmw.add(createExhaust(-1.2, 0.9, -4.8));
+      bmw.add(createExhaust(1.2, 0.9, -4.8));
+
+      return bmw;
+    }
+
+    // Wheels Builder
+    const wheelGeo = new THREE.CylinderGeometry(1.1, 1.1, 0.9, 24);
+    wheelGeo.rotateZ(Math.PI / 2);
+    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.7 });
+
+    function addWheels(parent) {
+      const positions = [
+        [-2.2, 1.1, 2.8], [2.2, 1.1, 2.8],
+        [-2.2, 1.1, -2.8], [2.2, 1.1, -2.8]
+      ];
+      positions.forEach(pos => {
+        const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+        wheel.position.set(...pos);
+        wheel.castShadow = true;
+        parent.add(wheel);
+      });
+    }
+
+    eccoMesh = buildEccoVan();
+    addWheels(eccoMesh);
+    vehicleGroup.add(eccoMesh);
+
+    bmwMesh = buildBmwCar();
+    addWheels(bmwMesh);
+    vehicleGroup.add(bmwMesh);
+    bmwMesh.visible = false;
+
+    let activeCarType = 'ecco';
+
+    function switchCar(type) {
+      activeCarType = type;
+      document.getElementById('btnEcco').classList.toggle('active', type === 'ecco');
+      document.getElementById('btnBmw').classList.toggle('active', type === 'bmw');
+
+      eccoMesh.visible = (type === 'ecco');
+      bmwMesh.visible = (type === 'bmw');
+    }
+
+    // --- CAR PHYSICS & CONTROL SYSTEM ---
+    const keys = { w: false, a: false, s: false, d: false, space: false, shift: false };
+    let currentSpeed = 0;
+    let gear = 1;
+    const maxGears = 10;
+    let steeringAngle = 0;
+
+    // Gear Speeds Scaling Table (Max Gear 10 = 500,000 KM/H Limit)
+    const gearMaxSpeeds = {
+      1: 150,
+      2: 400,
+      3: 1200,
+      4: 3500,
+      5: 10000,
+      6: 30000,
+      7: 80000,
+      8: 180000,
+      9: 320000,
+      10: 500000
+    };
+
+    // Keyboard Listeners
+    window.addEventListener('keydown', (e) => {
+      const k = e.key.toLowerCase();
+      if (k === 'w') keys.w = true;
+      if (k === 's') keys.s = true;
+      if (k === 'a') keys.a = true;
+      if (k ===
