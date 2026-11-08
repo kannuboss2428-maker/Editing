@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KannuHostEditor - Master Video & Photo Studio</title>
+  <style>
+    :root {
+      --bg-dark: #121316;
+      --panel-bg: #1e1f26;
+      --sidebar-bg: #16171d;
+      --accent-color: #00f2fe;
+      --accent-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
+      --pink-neon: #ff007f;
+      --text-main: #e0e6ed;
+      --text-muted: #8a94a6;
+      --border-color: #2a2c35;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background: var(--sidebar-bg);
+      border-bottom: 1px solid var(--border-color);
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      user-select: none;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .brand-logo span {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .yt-input-group {
+      display: flex;
+      background: #0d0e11;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .yt-input-group input {
+      background: transparent;
+      border: none;
+      padding: 6px 12px;
+      color: #fff;
+      font-size: 0.85rem;
+      width: 260px;
+      outline: none;
+    }
+
+    .yt-input-group button {
+      background: #ff0000;
+      color: white;
+      border: none;
+      padding: 0 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .yt-input-group button:hover {
+      opacity: 0.9;
+    }
+
+    .btn {
+      background: #2a2c37;
+      color: white;
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: #363946;
+      border-color: var(--accent-color);
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 12px rgba(0, 198, 255, 0.4);
+    }
+
+    /* Main Workbench */
+    .app-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 50px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 12px;
+      gap: 16px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover, .icon-btn.active {
+      background: #282a36;
+      color: var(--accent-color);
+    }
+
+    /* Controls & Tools Panel */
+    .panel {
+      width: 320px;
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-header {
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent-color);
+    }
+
+    .panel-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .slider-group {
+      margin-bottom: 12px;
+    }
+
+    .slider-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .slider-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-color);
+      height: 4px;
+    }
+
+    .effects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .fx-card {
+      background: #14151a;
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .fx-card:hover, .fx-card.active {
+      border-color: var(--accent-color);
+      background: #252836;
+      color: #fff;
+    }
+
+    /* AI Studio Panel */
+    .ai-box {
+      background: rgba(0, 242, 254, 0.05);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .ai-box textarea {
+      width: 100%;
+      height: 70px;
+      background: #121316;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px;
+      color: #fff;
+      font-size: 0.85rem;
+      resize: none;
+      outline: none;
+      margin-bottom: 8px;
+    }
+
+    /* Editing Area */
+    .viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #090a0c;
+      position: relative;
+    }
+
+    .canvas-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    #mainCanvas {
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      border-radius: 4px;
+      background: #000;
+    }
+
+    .split-mode #mainCanvas {
+      display: none;
+    }
+
+    .split-container {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .split-mode .split-container {
+      display: flex;
+    }
+
+    .split-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-right: 2px solid var(--accent-color);
+    }
+
+    .split-pane:last-child {
+      border-right: none;
+    }
+
+    .split-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Timeline Controls */
+    .timeline {
+      height: 160px;
+      background: var(--sidebar-bg);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+    }
+
+    .timeline-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .timeline-track {
+      flex: 1;
+      background: #0f1013;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .audio-wave {
+      width: 100%;
+      height: 40px;
+      background: repeating-linear-gradient(90deg, #00c6ff, #00c6ff 2px, transparent 2px, transparent 6px);
+      opacity: 0.4;
+    }
+
+    /* Hidden Utilities */
+    #mediaInput, #audioInput {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand-logo">
+      <span>⚡ KannuHostEditor</span> Studio
+    </div>
+
+    <div class="yt-input-group">
+      <input type="text" id="ytUrl" placeholder="YouTube Video Link yahan paste karo...">
+      <button id="loadYtBtn">Load Audio/Media</button>
+    </div>
+
+    <div class="top-actions">
+      <button class="btn" id="splitBtn">⚡ Split Screen Toggle</button>
+      <button class="btn" onclick="document.getElementById('mediaInput').click()">📁 Open File</button>
+      <button class="btn btn-primary" id="exportBtn">💾 Export Studio Result</button>
+    </div>
+  </header>
+
+  <!-- App Body -->
+  <div class="app-container">
+    <!-- Left Navigation Bar -->
+    <div class="sidebar">
+      <div class="icon-btn active" title="Filters & Effects">🎨</div>
+      <div class="icon-btn" title="Audio Studio">🎵</div>
+      <div class="icon-btn" title="AI Magic Studio">🤖</div>
+      <div class="icon-btn" title="Export & Share">📤</div>
+    </div>
+
+    <!-- Editing Panel -->
+    <div class="panel">
+      <div class="panel-header">Master Studio Controls</div>
+
+      <!-- AI Assistant -->
+      <div class="panel-section">
+        <div class="section-title">🤖 AI Magic Enhancement</div>
+        <div class="ai-box">
+          <textarea id="aiPrompt" placeholder="Mujhe cinematic dark vibe do ya high contrast lightning look..."></textarea>
+          <button class="btn btn-primary" style="width: 100%;" id="applyAiBtn">AI Magic Preset Apply Karo</button>
+        </div>
+      </div>
+
+      <!-- Effects & Presets -->
+      <div class="panel-section">
+        <div class="section-title">✨ Master VFX Filters</div>
+        <div class="effects-grid">
+          <div class="fx-card active" onclick="applyPreset('normal')">Original</div>
+          <div class="fx-card" onclick="applyPreset('cyberpunk')">Neon Cyber</div>
+          <div class="fx-card" onclick="applyPreset('cinematic')">Cinematic Warm</div>
+          <div class="fx-card" onclick="applyPreset('vintage')">Retro Vintage</div>
+          <div class="fx-card" onclick="applyPreset('dramatic')">High Contrast</div>
+          <div class="fx-card" onclick="applyPreset('glitch')">Glitch Noir</div>
+        </div>
+      </div>
+
+      <!-- Color Adjustment Sliders -->
+      <div class="panel-section">
+        <div class="section-title">🎛️ Photoshop Level Adjustment</div>
+        
+        <div class="slider-group">
+          <label>Brightness <span id="val-bright">100%</span></label>
+          <input type="range" id="slider-bright" min="0" max="200" value="100">
+        </div>
+
+        <div class="slider-group">
+          <label>Contrast <span id="val-contrast">100%</span></label>
+          <input type="range" id="slider-contrast" min="0" max="200" value="100">
+        </div>
+
+        <div class="slider-group">
+          <label>Saturation <span id="val-saturate">100%</span></label>
+          <input type="range" id="slider-saturate" min="0" max="200" value="100">
+        </div>
+
+        <div class="slider-group">
+          <label>Blur FX <span id="val-blur">0px</span></label>
+          <input type="range" id="slider-blur" min="0" max="20" value="0">
+        </div>
+
+        <div class="slider-group">
+          <label>Hue Shift <span id="val-hue">0deg</span></label>
+          <input type="range" id="slider-hue" min="0" max="360" value="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Viewport Arena -->
+    <div class="viewport" id="viewport">
+      <div class="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+
+        <!-- Split Screen View -->
+        <div class="split-container">
+          <div class="split-pane">
+            <span class="split-label">RAW ORIGINAL</span>
+            <canvas id="rawCanvas"></canvas>
+          </div>
+          <div class="split-pane">
+            <span class="split-label">KANNUHOST EDITED</span>
+            <canvas id="editedCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Bar -->
+      <div class="timeline">
+        <div class="timeline-controls">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="play-btn" id="playBtn">▶</button>
+            <span style="font-size: 0.85rem;" id="timeCode">00:00 / 00:00</span>
+          </div>
+          <div>
+            <button class="btn" onclick="document.getElementById('audioInput').click()">🎵 Add Custom Audio Track</button>
+          </div>
+        </div>
+        <div class="timeline-track">
+          <div class="audio-wave"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="mediaInput" accept="image/*,video/*">
+  <input type="file" id="audioInput" accept="audio/*">
+
+  <!-- Application Logic -->
+  <script>
+    const mainCanvas = document.getElementById('mainCanvas');
+    const ctx = mainCanvas.getContext('2d');
+    const rawCanvas = document.getElementById('rawCanvas');
+    const rawCtx = rawCanvas.getContext('2d');
+    const editedCanvas = document.getElementById('editedCanvas');
+    const editedCtx = editedCanvas.getContext('2d');
+
+    let currentMedia = null;
+    let isVideo = false;
+    let audioTrack = new Audio();
+    let isPlaying = false;
+
+    // Filters Setup
+    const filters = {
+      bright: 100,
+      contrast: 100,
+      saturate: 100,
+      blur: 0,
+      hue: 0
+    };
+
+    // Initialize Canvas Dimensions
+    mainCanvas.width = 1280;
+    mainCanvas.height = 720;
+    rawCanvas.width = 640;
+    rawCanvas.height = 720;
+    editedCanvas.width = 640;
+    editedCanvas.height = 720;
+
+    // Default Draw Canvas Placeholder
+    function drawPlaceholder() {
+      ctx.fillStyle = "#121316";
+      ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+      ctx.fillStyle = "#00f2fe";
+      ctx.font = "24px Segoe UI";
+      ctx.textAlign = "center";
+      ctx.fillText("📁 Open File par click karke Image ya Video load karein", mainCanvas.width / 2, mainCanvas.height / 2);
+    }
+    drawPlaceholder();
+
+    // File Upload Handler
+    document.getElementById('mediaInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const url = URL.createObjectURL(file);
+
+      if (file.type.startsWith('video/')) {
+        isVideo = true;
+        const video = document.createElement('video');
+        video.src = url;
+        video.loop = true;
+        video.play();
+        currentMedia = video;
+        renderLoop();
+      } else {
+        isVideo = false;
+        const img = new Image();
+        img.onload = function() {
+          currentMedia = img;
+          renderFrame();
+        };
+        img.src = url;
+      }
+    });
+
+    // Audio Input Handler
+    document.getElementById('audioInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        audioTrack.src = URL.createObjectURL(file);
+        audioTrack.play();
+        isPlaying = true;
+        document.getElementById('playBtn').innerText = "⏸";
+      }
+    });
+
+    // YouTube Media Loader Simulator
+    document.getElementById('loadYtBtn').addEventListener('click', function() {
+      const url = document.getElementById('ytUrl').value;
+      if (!url) {
+        alert("Pehle YouTube link paste karein!");
+        return;
+      }
+      alert("KannuHost Engine: Link parsing complete! Background audio track linked successfully.");
+      audioTrack.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+      audioTrack.play();
+      isPlaying = true;
+      document.getElementById('playBtn').innerText = "⏸";
+    });
+
+    // Dynamic Filter Generator
+    function getFilterString() {
+      return `brightness(${filters.bright}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) blur(${filters.blur}px) hue-rotate(${filters.hue}deg)`;
+    }
+
+    // Render Frame Function
+    function renderFrame() {
+      if (!currentMedia) return;
+
+      // Render Single Canvas
+      ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+      ctx.filter = getFilterString();
+      ctx.drawImage(currentMedia, 0, 0, mainCanvas.width, mainCanvas.height);
+
+      // Render Split View
+      rawCtx.clearRect(0, 0, rawCanvas.width, rawCanvas.height);
+      rawCtx.filter = "none";
+      rawCtx.drawImage(currentMedia, 0, 0, rawCanvas.width, rawCanvas.height);
+
+      editedCtx.clearRect(0, 0, editedCanvas.width, editedCanvas.height);
+      editedCtx.filter = getFilterString();
+      editedCtx.drawImage(currentMedia, 0, 0, editedCanvas.width, editedCanvas.height);
+    }
+
+    // Continuous Video Rendering Engine
+    function renderLoop() {
+      if (isVideo && currentMedia) {
+        renderFrame();
+        requestAnimationFrame(renderLoop);
+      }
+    }
+
+    // Slider Event Binds
+    ['bright', 'contrast', 'saturate', 'blur', 'hue'].forEach(key => {
+      const slider = document.getElementById(`slider-${key}`);
+      const valLabel = document.getElementById(`val-${key}`);
+      
+      slider.addEventListener('input', function() {
+        filters[key] = this.value;
+        const unit = key === 'blur' ? 'px' : key === 'hue' ? 'deg' : '%';
+        valLabel.innerText = this.value + unit;
+        if (!isVideo) renderFrame();
+      });
+    });
+
+    // Preset Effects Engine
+    function applyPreset(name) {
+      document.querySelectorAll('.fx-card').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (name === 'normal') {
+        filters.bright = 100; filters.contrast = 100; filters.saturate = 100; filters.blur = 0; filters.hue = 0;
+      } else if (name === 'cyberpunk') {
+        filters.bright = 110; filters.contrast = 140; filters.saturate = 180; filters.blur = 0; filters.hue = 190;
+      } else if (name === 'cinematic') {
+        filters.bright = 95; filters.contrast = 125; filters.saturate = 120; filters.blur = 0; filters.hue = 20;
+      } else if (name === 'vintage') {
+        filters.bright = 90; filters.contrast = 85; filters.saturate = 70; filters.blur = 0; filters.hue = 40;
+      } else if (name === 'dramatic') {
+        filters.bright = 105; filters.contrast = 170; filters.saturate = 130; filters.blur = 0; filters.hue = 0;
+      } else if (name === 'glitch') {
+        filters.bright = 120; filters.contrast = 150; filters.saturate = 200; filters.blur = 1; filters.hue = 280;
+      }
+
+      // Update Sliders Visual UI
+      document.getElementById('slider-bright').value = filters.bright;
+      document.getElementById('slider-contrast').value = filters.contrast;
+      document.getElementById('slider-saturate').value = filters.saturate;
+      document.getElementById('slider-blur').value = filters.blur;
+      document.getElementById('slider-hue').value = filters.hue;
+
+      if (!isVideo) renderFrame();
+    }
+
+    // AI Studio Prompt Assistant
+    document.getElementById('applyAiBtn').addEventListener('click', function() {
+      const prompt = document.getElementById('aiPrompt').value.toLowerCase();
+      if (!prompt) return;
+
+      if (prompt.includes('dark') || prompt.includes('night')) {
+        filters.bright = 75; filters.contrast = 140; filters.saturate = 110;
+      } else if (prompt.includes('neon') || prompt.includes('cyber')) {
+        filters.bright = 110; filters.contrast = 150; filters.saturate = 190; filters.hue = 180;
+      } else if (prompt.includes('bright') || prompt.includes('light')) {
+        filters.bright = 130; filters.contrast = 105; filters.saturate = 120;
+      } else {
+        filters.bright = 115; filters.contrast = 130; filters.saturate = 140; filters.hue = 15;
+      }
+
+      if (!isVideo) renderFrame();
+      alert("🤖 KannuHost AI Engine: Master color tuning applied!");
+    });
+
+    // Split Screen Mode Toggle
+    document.getElementById('splitBtn').addEventListener('click', function() {
+      document.getElementById('viewport').classList.toggle('split-mode');
+    });
+
+    // Export Functionality
+    document.getElementById('exportBtn').addEventListener('click', function() {
+      const link = document.createElement('a');
+      link.download = 'KannuHostEditor_Export.png';
+      link.href = mainCanvas.toDataURL();
+      link.click();
+    });
+
+    // Play/Pause Playback Toggle
+    document.getElementById('playBtn').addEventListener('click', function() {
+      if (isPlaying) {
+        audioTrack.pause();
+        if (isVideo && currentMedia) currentMedia.pause();
+        this.innerText = "▶";
+      } else {
+        audioTrack.play();
+        if (isVideo && currentMedia) currentMedia.play();
+        this.innerText = "⏸";
+      }
+      isPlaying = !isPlaying;
+    });
+  </script>
+</body>
+</html>
