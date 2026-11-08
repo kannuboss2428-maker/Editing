@@ -3,726 +3,406 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KannuHostEditor - Master Video & Photo Studio</title>
+  <title>KannuHost - Diwali Rocket Blaster Game</title>
   <style>
-    :root {
-      --bg-dark: #121316;
-      --panel-bg: #1e1f26;
-      --sidebar-bg: #16171d;
-      --accent-color: #00f2fe;
-      --accent-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
-      --pink-neon: #ff007f;
-      --text-main: #e0e6ed;
-      --text-muted: #8a94a6;
-      --border-color: #2a2c35;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* Top Navigation Bar */
-    header {
-      background: var(--sidebar-bg);
-      border-bottom: 1px solid var(--border-color);
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
       user-select: none;
     }
 
-    .brand-logo {
+    body {
+      background: #080711;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #fff;
+      height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 800px;
+      height: 600px;
+      background: linear-gradient(to bottom, #05050f 0%, #111029 70%, #1a0b2e 100%);
+      border: 3px solid #ffaa00;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* UI Header Overlay */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .score-board {
+      font-size: 22px;
       font-weight: 700;
-      font-size: 1.1rem;
-      color: #fff;
+      color: #ffea00;
+      text-shadow: 0 0 10px rgba(255, 234, 0, 0.6);
     }
 
-    .brand-logo span {
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .timer-board {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ff4081;
+      text-shadow: 0 0 10px rgba(255, 64, 129, 0.6);
     }
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .yt-input-group {
-      display: flex;
-      background: #0d0e11;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .yt-input-group input {
-      background: transparent;
-      border: none;
-      padding: 6px 12px;
-      color: #fff;
-      font-size: 0.85rem;
-      width: 260px;
-      outline: none;
-    }
-
-    .yt-input-group button {
-      background: #ff0000;
-      color: white;
-      border: none;
-      padding: 0 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    .yt-input-group button:hover {
-      opacity: 0.9;
-    }
-
-    .btn {
-      background: #2a2c37;
-      color: white;
-      border: 1px solid var(--border-color);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .btn:hover {
-      background: #363946;
-      border-color: var(--accent-color);
-    }
-
-    .btn-primary {
-      background: var(--accent-gradient);
-      border: none;
-    }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-      box-shadow: 0 0 12px rgba(0, 198, 255, 0.4);
-    }
-
-    /* Main Workbench */
-    .app-container {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* Left Sidebar */
-    .sidebar {
-      width: 50px;
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 12px;
-      gap: 16px;
-    }
-
-    .icon-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
-
-    .icon-btn:hover, .icon-btn.active {
-      background: #282a36;
-      color: var(--accent-color);
-    }
-
-    /* Controls & Tools Panel */
-    .panel {
-      width: 320px;
-      background: var(--panel-bg);
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-
-    .panel-header {
-      padding: 14px 16px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border-bottom: 1px solid var(--border-color);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--accent-color);
-    }
-
-    .panel-section {
-      padding: 16px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .section-title {
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #fff;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .slider-group {
-      margin-bottom: 12px;
-    }
-
-    .slider-group label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .slider-group input[type="range"] {
+    /* Game Screens Overlay */
+    .screen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      accent-color: var(--accent-color);
-      height: 4px;
-    }
-
-    .effects-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-    }
-
-    .fx-card {
-      background: #14151a;
-      border: 1px solid var(--border-color);
-      padding: 10px;
-      border-radius: 6px;
+      height: 100%;
+      background: rgba(8, 7, 17, 0.85);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
       text-align: center;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .fx-card:hover, .fx-card.active {
-      border-color: var(--accent-color);
-      background: #252836;
-      color: #fff;
-    }
-
-    /* AI Studio Panel */
-    .ai-box {
-      background: rgba(0, 242, 254, 0.05);
-      border: 1px solid rgba(0, 242, 254, 0.2);
-      border-radius: 8px;
-      padding: 12px;
-    }
-
-    .ai-box textarea {
-      width: 100%;
-      height: 70px;
-      background: #121316;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 8px;
-      color: #fff;
-      font-size: 0.85rem;
-      resize: none;
-      outline: none;
-      margin-bottom: 8px;
-    }
-
-    /* Editing Area */
-    .viewport {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #090a0c;
-      position: relative;
-    }
-
-    .canvas-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
       padding: 20px;
     }
 
-    #mainCanvas {
-      max-width: 100%;
-      max-height: 100%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-      border-radius: 4px;
-      background: #000;
-    }
-
-    .split-mode #mainCanvas {
-      display: none;
-    }
-
-    .split-container {
-      display: none;
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    .split-mode .split-container {
-      display: flex;
-    }
-
-    .split-pane {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      border-right: 2px solid var(--accent-color);
-    }
-
-    .split-pane:last-child {
-      border-right: none;
-    }
-
-    .split-label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(0,0,0,0.7);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    /* Timeline Controls */
-    .timeline {
-      height: 160px;
-      background: var(--sidebar-bg);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-    }
-
-    .timeline-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .title {
+      font-size: 42px;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff0055, #ffcc00, #00ffcc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
 
-    .play-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
+    .subtitle {
+      font-size: 16px;
+      color: #cfd8dc;
+      margin-bottom: 30px;
+      max-width: 500px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff9900, #ff5500);
+      color: #fff;
       border: none;
-      color: white;
+      padding: 14px 36px;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 50px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
+      box-shadow: 0 0 20px rgba(255, 102, 0, 0.6);
+      transition: all 0.2s ease;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
     }
 
-    .timeline-track {
-      flex: 1;
-      background: #0f1013;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
+    .btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 30px rgba(255, 102, 0, 0.9);
     }
 
-    .audio-wave {
-      width: 100%;
-      height: 40px;
-      background: repeating-linear-gradient(90deg, #00c6ff, #00c6ff 2px, transparent 2px, transparent 6px);
-      opacity: 0.4;
+    .hidden {
+      display: none !important;
     }
 
-    /* Hidden Utilities */
-    #mediaInput, #audioInput {
-      display: none;
+    .brand-footer {
+      position: absolute;
+      bottom: 12px;
+      font-size: 13px;
+      color: #78909c;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
-  <header>
-    <div class="brand-logo">
-      <span>⚡ KannuHostEditor</span> Studio
+  <div id="game-container">
+    <!-- UI Overlay -->
+    <div class="ui-layer">
+      <div class="score-board">🪔 Score: <span id="scoreText">0</span></div>
+      <div class="timer-board">⏱️ Time: <span id="timerText">60</span>s</div>
     </div>
 
-    <div class="yt-input-group">
-      <input type="text" id="ytUrl" placeholder="YouTube Video Link yahan paste karo...">
-      <button id="loadYtBtn">Load Audio/Media</button>
+    <!-- Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen-overlay">
+      <h1 class="title">🪔 Diwali Rocket Blaster</h1>
+      <p class="subtitle">Aasmaan me aane wale Rocket Crackers par click karke unhe burst karo aur shandar Diwali Aatishbaji banao! Ghanti wallah bomb touch mat karna!</p>
+      <button class="btn" onclick="startGame()">PLAY GAME</button>
+      <div class="brand-footer">Powered by ⚡ KannuHost Engine</div>
     </div>
 
-    <div class="top-actions">
-      <button class="btn" id="splitBtn">⚡ Split Screen Toggle</button>
-      <button class="btn" onclick="document.getElementById('mediaInput').click()">📁 Open File</button>
-      <button class="btn btn-primary" id="exportBtn">💾 Export Studio Result</button>
-    </div>
-  </header>
-
-  <!-- App Body -->
-  <div class="app-container">
-    <!-- Left Navigation Bar -->
-    <div class="sidebar">
-      <div class="icon-btn active" title="Filters & Effects">🎨</div>
-      <div class="icon-btn" title="Audio Studio">🎵</div>
-      <div class="icon-btn" title="AI Magic Studio">🤖</div>
-      <div class="icon-btn" title="Export & Share">📤</div>
-    </div>
-
-    <!-- Editing Panel -->
-    <div class="panel">
-      <div class="panel-header">Master Studio Controls</div>
-
-      <!-- AI Assistant -->
-      <div class="panel-section">
-        <div class="section-title">🤖 AI Magic Enhancement</div>
-        <div class="ai-box">
-          <textarea id="aiPrompt" placeholder="Mujhe cinematic dark vibe do ya high contrast lightning look..."></textarea>
-          <button class="btn btn-primary" style="width: 100%;" id="applyAiBtn">AI Magic Preset Apply Karo</button>
-        </div>
-      </div>
-
-      <!-- Effects & Presets -->
-      <div class="panel-section">
-        <div class="section-title">✨ Master VFX Filters</div>
-        <div class="effects-grid">
-          <div class="fx-card active" onclick="applyPreset('normal')">Original</div>
-          <div class="fx-card" onclick="applyPreset('cyberpunk')">Neon Cyber</div>
-          <div class="fx-card" onclick="applyPreset('cinematic')">Cinematic Warm</div>
-          <div class="fx-card" onclick="applyPreset('vintage')">Retro Vintage</div>
-          <div class="fx-card" onclick="applyPreset('dramatic')">High Contrast</div>
-          <div class="fx-card" onclick="applyPreset('glitch')">Glitch Noir</div>
-        </div>
-      </div>
-
-      <!-- Color Adjustment Sliders -->
-      <div class="panel-section">
-        <div class="section-title">🎛️ Photoshop Level Adjustment</div>
-        
-        <div class="slider-group">
-          <label>Brightness <span id="val-bright">100%</span></label>
-          <input type="range" id="slider-bright" min="0" max="200" value="100">
-        </div>
-
-        <div class="slider-group">
-          <label>Contrast <span id="val-contrast">100%</span></label>
-          <input type="range" id="slider-contrast" min="0" max="200" value="100">
-        </div>
-
-        <div class="slider-group">
-          <label>Saturation <span id="val-saturate">100%</span></label>
-          <input type="range" id="slider-saturate" min="0" max="200" value="100">
-        </div>
-
-        <div class="slider-group">
-          <label>Blur FX <span id="val-blur">0px</span></label>
-          <input type="range" id="slider-blur" min="0" max="20" value="0">
-        </div>
-
-        <div class="slider-group">
-          <label>Hue Shift <span id="val-hue">0deg</span></label>
-          <input type="range" id="slider-hue" min="0" max="360" value="0">
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Viewport Arena -->
-    <div class="viewport" id="viewport">
-      <div class="canvas-container">
-        <canvas id="mainCanvas"></canvas>
-
-        <!-- Split Screen View -->
-        <div class="split-container">
-          <div class="split-pane">
-            <span class="split-label">RAW ORIGINAL</span>
-            <canvas id="rawCanvas"></canvas>
-          </div>
-          <div class="split-pane">
-            <span class="split-label">KANNUHOST EDITED</span>
-            <canvas id="editedCanvas"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Timeline Bar -->
-      <div class="timeline">
-        <div class="timeline-controls">
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button class="play-btn" id="playBtn">▶</button>
-            <span style="font-size: 0.85rem;" id="timeCode">00:00 / 00:00</span>
-          </div>
-          <div>
-            <button class="btn" onclick="document.getElementById('audioInput').click()">🎵 Add Custom Audio Track</button>
-          </div>
-        </div>
-        <div class="timeline-track">
-          <div class="audio-wave"></div>
-        </div>
-      </div>
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen-overlay hidden">
+      <h1 class="title">💥 HAPPY DIWALI! 🪔</h1>
+      <p class="subtitle" style="font-size: 22px; color: #ffea00;" id="finalScoreText">Your Score: 0</p>
+      <p class="subtitle">Aapne pure aasmaan ko colorful patako se roshan kar diya!</p>
+      <button class="btn" onclick="startGame()">PLAY AGAIN</button>
     </div>
   </div>
 
-  <input type="file" id="mediaInput" accept="image/*,video/*">
-  <input type="file" id="audioInput" accept="audio/*">
-
-  <!-- Application Logic -->
   <script>
-    const mainCanvas = document.getElementById('mainCanvas');
-    const ctx = mainCanvas.getContext('2d');
-    const rawCanvas = document.getElementById('rawCanvas');
-    const rawCtx = rawCanvas.getContext('2d');
-    const editedCanvas = document.getElementById('editedCanvas');
-    const editedCtx = editedCanvas.getContext('2d');
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-    let currentMedia = null;
-    let isVideo = false;
-    let audioTrack = new Audio();
+    canvas.width = 800;
+    canvas.height = 600;
+
+    let score = 0;
+    let timeLeft = 60;
+    let gameInterval = null;
+    let timerInterval = null;
     let isPlaying = false;
 
-    // Filters Setup
-    const filters = {
-      bright: 100,
-      contrast: 100,
-      saturate: 100,
-      blur: 0,
-      hue: 0
-    };
+    let rockets = [];
+    let particles = [];
+    let diyaList = [];
 
-    // Initialize Canvas Dimensions
-    mainCanvas.width = 1280;
-    mainCanvas.height = 720;
-    rawCanvas.width = 640;
-    rawCanvas.height = 720;
-    editedCanvas.width = 640;
-    editedCanvas.height = 720;
-
-    // Default Draw Canvas Placeholder
-    function drawPlaceholder() {
-      ctx.fillStyle = "#121316";
-      ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
-      ctx.fillStyle = "#00f2fe";
-      ctx.font = "24px Segoe UI";
-      ctx.textAlign = "center";
-      ctx.fillText("📁 Open File par click karke Image ya Video load karein", mainCanvas.width / 2, mainCanvas.height / 2);
-    }
-    drawPlaceholder();
-
-    // File Upload Handler
-    document.getElementById('mediaInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const url = URL.createObjectURL(file);
-
-      if (file.type.startsWith('video/')) {
-        isVideo = true;
-        const video = document.createElement('video');
-        video.src = url;
-        video.loop = true;
-        video.play();
-        currentMedia = video;
-        renderLoop();
-      } else {
-        isVideo = false;
-        const img = new Image();
-        img.onload = function() {
-          currentMedia = img;
-          renderFrame();
-        };
-        img.src = url;
-      }
-    });
-
-    // Audio Input Handler
-    document.getElementById('audioInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        audioTrack.src = URL.createObjectURL(file);
-        audioTrack.play();
-        isPlaying = true;
-        document.getElementById('playBtn').innerText = "⏸";
-      }
-    });
-
-    // YouTube Media Loader Simulator
-    document.getElementById('loadYtBtn').addEventListener('click', function() {
-      const url = document.getElementById('ytUrl').value;
-      if (!url) {
-        alert("Pehle YouTube link paste karein!");
-        return;
-      }
-      alert("KannuHost Engine: Link parsing complete! Background audio track linked successfully.");
-      audioTrack.src = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-      audioTrack.play();
-      isPlaying = true;
-      document.getElementById('playBtn').innerText = "⏸";
-    });
-
-    // Dynamic Filter Generator
-    function getFilterString() {
-      return `brightness(${filters.bright}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) blur(${filters.blur}px) hue-rotate(${filters.hue}deg)`;
-    }
-
-    // Render Frame Function
-    function renderFrame() {
-      if (!currentMedia) return;
-
-      // Render Single Canvas
-      ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-      ctx.filter = getFilterString();
-      ctx.drawImage(currentMedia, 0, 0, mainCanvas.width, mainCanvas.height);
-
-      // Render Split View
-      rawCtx.clearRect(0, 0, rawCanvas.width, rawCanvas.height);
-      rawCtx.filter = "none";
-      rawCtx.drawImage(currentMedia, 0, 0, rawCanvas.width, rawCanvas.height);
-
-      editedCtx.clearRect(0, 0, editedCanvas.width, editedCanvas.height);
-      editedCtx.filter = getFilterString();
-      editedCtx.drawImage(currentMedia, 0, 0, editedCanvas.width, editedCanvas.height);
-    }
-
-    // Continuous Video Rendering Engine
-    function renderLoop() {
-      if (isVideo && currentMedia) {
-        renderFrame();
-        requestAnimationFrame(renderLoop);
-      }
-    }
-
-    // Slider Event Binds
-    ['bright', 'contrast', 'saturate', 'blur', 'hue'].forEach(key => {
-      const slider = document.getElementById(`slider-${key}`);
-      const valLabel = document.getElementById(`val-${key}`);
-      
-      slider.addEventListener('input', function() {
-        filters[key] = this.value;
-        const unit = key === 'blur' ? 'px' : key === 'hue' ? 'deg' : '%';
-        valLabel.innerText = this.value + unit;
-        if (!isVideo) renderFrame();
+    // Initialize Bottom Decorative Diyas
+    for (let i = 0; i < 9; i++) {
+      diyaList.push({
+        x: 60 + i * 85,
+        y: 575
       });
-    });
-
-    // Preset Effects Engine
-    function applyPreset(name) {
-      document.querySelectorAll('.fx-card').forEach(el => el.classList.remove('active'));
-      event.target.classList.add('active');
-
-      if (name === 'normal') {
-        filters.bright = 100; filters.contrast = 100; filters.saturate = 100; filters.blur = 0; filters.hue = 0;
-      } else if (name === 'cyberpunk') {
-        filters.bright = 110; filters.contrast = 140; filters.saturate = 180; filters.blur = 0; filters.hue = 190;
-      } else if (name === 'cinematic') {
-        filters.bright = 95; filters.contrast = 125; filters.saturate = 120; filters.blur = 0; filters.hue = 20;
-      } else if (name === 'vintage') {
-        filters.bright = 90; filters.contrast = 85; filters.saturate = 70; filters.blur = 0; filters.hue = 40;
-      } else if (name === 'dramatic') {
-        filters.bright = 105; filters.contrast = 170; filters.saturate = 130; filters.blur = 0; filters.hue = 0;
-      } else if (name === 'glitch') {
-        filters.bright = 120; filters.contrast = 150; filters.saturate = 200; filters.blur = 1; filters.hue = 280;
-      }
-
-      // Update Sliders Visual UI
-      document.getElementById('slider-bright').value = filters.bright;
-      document.getElementById('slider-contrast').value = filters.contrast;
-      document.getElementById('slider-saturate').value = filters.saturate;
-      document.getElementById('slider-blur').value = filters.blur;
-      document.getElementById('slider-hue').value = filters.hue;
-
-      if (!isVideo) renderFrame();
     }
 
-    // AI Studio Prompt Assistant
-    document.getElementById('applyAiBtn').addEventListener('click', function() {
-      const prompt = document.getElementById('aiPrompt').value.toLowerCase();
-      if (!prompt) return;
-
-      if (prompt.includes('dark') || prompt.includes('night')) {
-        filters.bright = 75; filters.contrast = 140; filters.saturate = 110;
-      } else if (prompt.includes('neon') || prompt.includes('cyber')) {
-        filters.bright = 110; filters.contrast = 150; filters.saturate = 190; filters.hue = 180;
-      } else if (prompt.includes('bright') || prompt.includes('light')) {
-        filters.bright = 130; filters.contrast = 105; filters.saturate = 120;
-      } else {
-        filters.bright = 115; filters.contrast = 130; filters.saturate = 140; filters.hue = 15;
+    class Rocket {
+      constructor() {
+        this.x = Math.random() * (canvas.width - 100) + 50;
+        this.y = canvas.height + 20;
+        this.speed = Math.random() * 2.5 + 2.5;
+        this.radius = 16;
+        this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        this.isBomb = Math.random() < 0.15; // 15% chance to spawn black bomb
+        if (this.isBomb) {
+          this.color = '#333';
+        }
       }
 
-      if (!isVideo) renderFrame();
-      alert("🤖 KannuHost AI Engine: Master color tuning applied!");
-    });
-
-    // Split Screen Mode Toggle
-    document.getElementById('splitBtn').addEventListener('click', function() {
-      document.getElementById('viewport').classList.toggle('split-mode');
-    });
-
-    // Export Functionality
-    document.getElementById('exportBtn').addEventListener('click', function() {
-      const link = document.createElement('a');
-      link.download = 'KannuHostEditor_Export.png';
-      link.href = mainCanvas.toDataURL();
-      link.click();
-    });
-
-    // Play/Pause Playback Toggle
-    document.getElementById('playBtn').addEventListener('click', function() {
-      if (isPlaying) {
-        audioTrack.pause();
-        if (isVideo && currentMedia) currentMedia.pause();
-        this.innerText = "▶";
-      } else {
-        audioTrack.play();
-        if (isVideo && currentMedia) currentMedia.play();
-        this.innerText = "⏸";
+      update() {
+        this.y -= this.speed;
       }
-      isPlaying = !isPlaying;
+
+      draw() {
+        ctx.save();
+        if (this.isBomb) {
+          // Draw Danger Bomb Rocket
+          ctx.fillStyle = '#ff1744';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 14px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('💣', this.x, this.y + 5);
+        } else {
+          // Draw Rocket Body
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y - 20);
+          ctx.lineTo(this.x - 10, this.y + 10);
+          ctx.lineTo(this.x + 10, this.y + 10);
+          ctx.closePath();
+          ctx.fill();
+
+          // Rocket Tail Flame
+          ctx.fillStyle = '#ff9900';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y + 14, 5 + Math.random() * 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 6 + 1;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.02 + 0.015;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.05; // gravity effect
+        this.alpha -= this.decay;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function createExplosion(x, y, color) {
+      const particleCount = 40;
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle(x, y, color));
+      }
+    }
+
+    function drawDiyas() {
+      diyaList.forEach(diya => {
+        // Base
+        ctx.fillStyle = '#d84315';
+        ctx.beginPath();
+        ctx.arc(diya.x, diya.y, 16, 0, Math.PI);
+        ctx.fill();
+
+        // Flame
+        ctx.fillStyle = '#ffea00';
+        ctx.beginPath();
+        ctx.arc(diya.x, diya.y - 6, 5 + Math.random() * 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ff3d00';
+        ctx.beginPath();
+        ctx.arc(diya.x, diya.y - 4, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function gameLoop() {
+      if (!isPlaying) return;
+
+      // Clear & Draw Night Sky
+      ctx.fillStyle = 'rgba(8, 7, 17, 0.25)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Bottom Diyas
+      drawDiyas();
+
+      // Spawn Rockets Randomly
+      if (Math.random() < 0.05) {
+        rockets.push(new Rocket());
+      }
+
+      // Update & Draw Rockets
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        r.update();
+        r.draw();
+
+        // Remove offscreen rockets
+        if (r.y < -30) {
+          rockets.splice(i, 1);
+        }
+      }
+
+      // Update & Draw Explosions Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw();
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Click Detection for Bursting Rockets
+    canvas.addEventListener('pointerdown', function (e) {
+      if (!isPlaying) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        const dist = Math.hypot(clickX - r.x, clickY - r.y);
+
+        if (dist < r.radius + 15) {
+          if (r.isBomb) {
+            // Bomb Clicked Penalty
+            score = Math.max(0, score - 50);
+            createExplosion(r.x, r.y, '#ff0000');
+          } else {
+            // Rocket Hit Success
+            score += 100;
+            createExplosion(r.x, r.y, r.color);
+          }
+
+          document.getElementById('scoreText').innerText = score;
+          rockets.splice(i, 1);
+          break;
+        }
+      }
     });
+
+    function startGame() {
+      score = 0;
+      timeLeft = 60;
+      rockets = [];
+      particles = [];
+      isPlaying = true;
+
+      document.getElementById('scoreText').innerText = score;
+      document.getElementById('timerText').innerText = timeLeft;
+
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('gameOverScreen').classList.add('hidden');
+
+      if (timerInterval) clearInterval(timerInterval);
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timerText').innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(timerInterval);
+      document.getElementById('finalScoreText').innerText = `Final Score: ${score}`;
+      document.getElementById('gameOverScreen').classList.remove('hidden');
+    }
   </script>
 </body>
 </html>
