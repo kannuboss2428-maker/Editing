@@ -467,4 +467,117 @@
       if (k === 'w') keys.w = true;
       if (k === 's') keys.s = true;
       if (k === 'a') keys.a = true;
-      if (k ===
+      if (k === 'd') keys.d = true;
+      if (e.code === 'Space') keys.space = true;
+      if (e.key === 'Shift') keys.shift = true;
+
+      // Gear Shifts
+      if (k === 'e') {
+        if (gear < maxGears) gear++;
+        updateGearUI();
+      }
+      if (k === 'q') {
+        if (gear > 1) gear--;
+        updateGearUI();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const k = e.key.toLowerCase();
+      if (k === 'w') keys.w = false;
+      if (k === 's') keys.s = false;
+      if (k === 'a') keys.a = false;
+      if (k === 'd') keys.d = false;
+      if (e.code === 'Space') keys.space = false;
+      if (e.key === 'Shift') keys.shift = false;
+    });
+
+    function updateGearUI() {
+      document.getElementById('gearDisplay').innerText = `G ${gear}`;
+    }
+
+    // --- GAME LOOP & ANIMATION ---
+    const clock = new THREE.Clock();
+
+    function updatePhysics() {
+      const delta = clock.getDelta();
+      const topSpeedLimit = gearMaxSpeeds[gear];
+
+      // Acceleration Logic
+      let accelPower = (topSpeedLimit * 0.4) + (gear * 150);
+      if (keys.shift) {
+        accelPower *= 2.5; // Nitro Beast Boost
+      }
+
+      if (keys.w) {
+        if (currentSpeed < topSpeedLimit) {
+          currentSpeed += accelPower * delta;
+        }
+      } else if (keys.s) {
+        if (currentSpeed > -200) {
+          currentSpeed -= accelPower * 0.8 * delta;
+        }
+      } else {
+        // Natural Friction Drag
+        currentSpeed *= 0.985;
+      }
+
+      // Handbrake Break Logic
+      if (keys.space) {
+        currentSpeed *= 0.88;
+      }
+
+      // Steering Logic
+      const turnSens = 0.025 - Math.min(0.02, (Math.abs(currentSpeed) / 500000) * 0.02);
+      if (keys.a) steeringAngle += turnSens;
+      if (keys.d) steeringAngle -= turnSens;
+
+      steeringAngle *= 0.9;
+      vehicleGroup.rotation.y += steeringAngle * (currentSpeed / 200);
+
+      // Move Vehicle Forward in 3D Space
+      const moveDistance = (currentSpeed / 3.6) * delta;
+      vehicleGroup.translateZ(moveDistance * 0.1);
+
+      // Exhaust Fire Nitro Animation
+      const isFire = keys.shift && Math.abs(currentSpeed) > 10;
+      exhaustFlames.forEach(flame => {
+        flame.visible = isFire;
+        if (isFire) {
+          flame.scale.set(1 + Math.random(), 1 + Math.random() * 2, 1 + Math.random());
+        }
+      });
+
+      document.getElementById('nitroFx').classList.toggle('nitro-active', isFire);
+      document.getElementById('nosText').innerText = isFire ? "🔥 EXHAUST FIRE ACTIVE!" : "EXHAUST READY";
+      document.getElementById('nosText').style.color = isFire ? "#ff0055" : "#00ffcc";
+
+      // Smooth Camera Follow System (Horizon Third-Person View)
+      const targetVehicle = activeCarType === 'ecco' ? eccoMesh : bmwMesh;
+      const camOffset = new THREE.Vector3(0, 12, -28);
+      camOffset.applyQuaternion(vehicleGroup.quaternion);
+      
+      camera.position.lerp(vehicleGroup.position.clone().add(camOffset), 0.1);
+      camera.lookAt(vehicleGroup.position.clone().add(new THREE.Vector3(0, 4, 15).applyQuaternion(vehicleGroup.quaternion)));
+
+      // Update Speedometer UI
+      document.getElementById('speedometer').innerText = Math.floor(Math.abs(currentSpeed)).toLocaleString();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      updatePhysics();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Window Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
